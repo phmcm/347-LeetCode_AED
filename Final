@@ -1,0 +1,74 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdbool.h>
+
+struct ElementFrequency {
+    int element;
+    int frequency;
+};
+
+int compare(const void *a, const void *b) {
+    return ((struct ElementFrequency*)b)->frequency - ((struct ElementFrequency*)a)->frequency;
+}
+
+int* topKFrequent(int* nums, int numsSize, int k, int* returnSize) {
+    struct ElementFrequency* freqCount = (struct ElementFrequency*)malloc(numsSize * sizeof(struct ElementFrequency));
+    int uniqueCount = 0;
+    for (int i = 0; i < numsSize; i++) {
+        int current = nums[i];
+        bool found = false;
+        for (int j = 0; j < uniqueCount; j++) {
+            if (freqCount[j].element == current) {
+                freqCount[j].frequency++;
+                found = true;
+                break;
+            }
+        }
+        if (!found) {
+            freqCount[uniqueCount].element = current;
+            freqCount[uniqueCount].frequency = 1;
+            uniqueCount++;
+        }
+    }
+
+    qsort(freqCount, uniqueCount, sizeof(struct ElementFrequency), compare);
+
+    int* result = (int*)malloc(k * sizeof(int));
+    for (int i = 0; i < k; i++) {
+        result[i] = freqCount[i].element;
+    }
+
+    *returnSize = k;
+    free(freqCount);
+
+    return result;
+}
+
+int main() {
+    int n;
+    printf("Digite o tamanho do array nums: ");
+    scanf("%d", &n);
+    
+    int nums[n];
+    printf("Digite os elementos do array nums separados por espaços:\n");
+    for (int i = 0; i < n; i++) {
+        scanf("%d", &nums[i]);
+    }
+    
+    int k;
+    printf("Digite o valor de k: ");
+    scanf("%d", &k);
+
+    int returnSize;
+    int* result = topKFrequent(nums, n, k, &returnSize);
+
+    printf("Os %d elementos mais frequentes são: ", k);
+    for (int i = 0; i < returnSize; i++) {
+        printf("%d ", result[i]);
+    }
+    printf("\n");
+
+    free(result);
+
+    return 0;
+}
